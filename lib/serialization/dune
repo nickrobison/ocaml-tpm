@@ -1,0 +1,6 @@
+(library
+ (name serialization)
+ (wrapped false)
+ (libraries cstruct sexplib)
+ (preprocess
+  (pps ppx_deriving.show ppx_sexp_conv ppx_cstruct)))
