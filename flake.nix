@@ -6,20 +6,17 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }: {
-    flake-utils.lib.eachDefaultSystem
-      (system:
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
       let pkgs = import nixpkgs {
-            inherit system
+            inherit system;
           };
       in
-      with pkgs;
+        with pkgs;
       {
+        defaultPackage = (callPackage ./nix/mssim.nix {}).mssim;
         devShells.default = mkShell {
-          buildInputs = []
-        }
-      }
-      )
-
-  };
-}
+          buildInputs = [];
+        };
+      });
+  }

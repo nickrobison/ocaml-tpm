@@ -19,7 +19,7 @@
  (name tpm2)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune logs fmt lwt ppx_deriving ppx_sexp_conv cstruct ppx_cstruct)
+ (depends ocaml dune logs fmt lwt ppx_deriving ppx_sexp_conv cstruct ppx_cstruct cohttp-lwt-unix alcotest cstruct-lwt)
  (tags
   (topics "to describe" your project)))
 

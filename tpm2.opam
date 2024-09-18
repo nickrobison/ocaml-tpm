@@ -19,6 +19,9 @@ depends: [
   "ppx_sexp_conv"
   "cstruct"
   "ppx_cstruct"
+  "cohttp-lwt-unix"
+  "alcotest"
+  "cstruct-lwt"
   "odoc" {with-doc}
 ]
 build: [

@@ -1,0 +1,4 @@
+(library
+ (name mssim)
+ (wrapped false)
+ (libraries cohttp-lwt-unix tpm2 cstruct cstruct-lwt))
