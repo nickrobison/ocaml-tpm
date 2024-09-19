@@ -25,8 +25,24 @@ let connect fd _host port =
 
 let handle_execute fd payload =
   let* _ = Lwt_cstruct.write fd payload in
-  let resp = Cstruct.create Serialization.Tpm_response.sizeof_t in
-  let+ _ = Lwt_cstruct.read fd resp in
+  let resp = Cstruct.create Tpm_command.sizeof_response in
+  let* _ = Lwt_cstruct.read fd resp in
+  let resp_size = Tpm_command.get_response_output_size resp in
+  print_endline (Fmt.str "%a" Fmt.int32 resp_size);
+  let resp' = Cstruct.create Serialization.Tpm_response.sizeof_t in
+  let+ _ = Lwt_cstruct.read fd resp' in
+  print_endline "Read again";
+  print_endline (Fmt.str "What did we get? %a" Cstruct.hexdump_pp resp');
+  let tag =
+    Serialization.Tpm_response.get_t_tag resp'
+    |> Serialization.Struct_tag.int_to_t |> Option.get
+  in
+  let cc = Serialization.Tpm_response.get_t_response_code resp' in
+  let sz = Serialization.Tpm_response.get_t_response_size resp' in
+  print_endline
+    (Fmt.str "Got tag %i and code %a with size: %a"
+       (Serialization.Struct_tag.t_to_int tag)
+       Fmt.int32 cc Fmt.int32 sz);
   Ok "nope"
 
 let send_command fd cmd =
@@ -60,4 +76,12 @@ let shutdown t =
 
 let execute t payload =
   let tpm = t.tpm in
-  handle_execute tpm payload
+  (*MSSIM requires command 8, locality and payload size, then the payload*)
+  let payload_size = Cstruct.length payload |> Int32.of_int in
+  print_endline "Sized payload";
+  let body = Cstruct.create Tpm_command.sizeof_payload in
+  Tpm_command.set_payload_command body
+    (Platform_command.t_to_int Platform_command.SendCommand);
+  Tpm_command.set_payload_locality body 0;
+  Tpm_command.set_payload_payload_size body payload_size;
+  handle_execute tpm (Cstruct.append body payload)

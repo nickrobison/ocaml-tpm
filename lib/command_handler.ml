@@ -13,7 +13,7 @@ module Make (D : Device.S) = struct
   let run_command (type a) (module C : Command.S with type t = a) t c =
     let serialized = C.serialize c |> Result.get_ok in
     let* _ =
-      Log.info (fun f -> f "Serialized to: %a" Cstruct.hexdump_pp serialized)
+      Log.err (fun f -> f "Serialized to: %a" Cstruct.hexdump_pp serialized)
     in
     let* _res = D.execute t.device serialized in
     let* _ = Log.info (fun f -> f "Received response: ") in

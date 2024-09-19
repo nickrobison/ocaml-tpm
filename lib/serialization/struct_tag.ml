@@ -4,3 +4,4 @@ type t =
   | NoSessions [@id 0x8001]
   | Sessions [@id 0x8002]
 [@@uint16_t]]
+[@@deriving show]
