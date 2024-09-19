@@ -13,9 +13,12 @@ let make_socket _host port =
 
 let startup_platform io =
   print_endline "Doing startup";
-  let b = Cstruct.create 4 in
-  let _ = Cstruct.BE.set_uint32 b 0 (Int32.of_int 20000) in
-  let* _ = Lwt_cstruct.write io b in
+  let cmd = Cstruct.create Platform_command.sizeof_payload in
+  let _ =
+    Platform_command.set_payload_command cmd
+      (Platform_command.t_to_int Platform_command.PowerOn)
+  in
+  let* _ = Lwt_cstruct.write io cmd in
   let resp = Cstruct.create 4 in
   let* _ = Lwt_cstruct.read io resp in
   let res = Cstruct.BE.get_uint32 resp 0 in
