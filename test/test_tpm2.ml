@@ -1,8 +1,8 @@
 let test_ok () = Alcotest.(check string) "same string" "hello" "hello"
 
 let test_connect () =
-  let made = Mssim.make "localhost" 2321 2322 in
-  let _ = Lwt_main.run made in
+  let made = Mssim.make ~host:"localhost" ~port:2321 ~system_port:2322 () in
+  let _ = Lwt_main.run (Mssim.initialize made) in
   ()
 
 let () =

@@ -1,35 +1,51 @@
 open Lwt.Syntax
 
-type t = { platform : Lwt_unix.file_descr }
+type t = {
+  host : string;
+  port : int;
+  system_port : int;
+  platform : Lwt_unix.file_descr;
+  tpm : Lwt_unix.file_descr;
+}
 
 let name = "mssim"
 
-let make_socket _host port =
-  let addr = UnixLabels.inet_addr_loopback in
-  let s_addr = Lwt_unix.ADDR_INET (addr, port) in
+let make_socket () =
   let sock = Lwt_unix.socket Lwt_unix.PF_INET Lwt_unix.SOCK_STREAM 0 in
-  let+ _ = Lwt_unix.connect sock s_addr in
   sock
 
-let startup_platform io =
-  print_endline "Doing startup";
-  let cmd = Cstruct.create Platform_command.sizeof_payload in
-  let _ =
-    Platform_command.set_payload_command cmd
-      (Platform_command.t_to_int Platform_command.PowerOn)
-  in
-  let* _ = Lwt_cstruct.write io cmd in
-  let resp = Cstruct.create 4 in
-  let* _ = Lwt_cstruct.read io resp in
-  let res = Cstruct.BE.get_uint32 resp 0 in
-  print_endline "Written!";
-  print_endline (Int32.to_string res);
-  Lwt.return_unit
+let connect fd _host port =
+  let loop = Unix.inet6_addr_loopback in
+  let addr = Unix.ADDR_INET (loop, port) in
+  Lwt_unix.connect fd addr
 
-let make host (_port : int) system_port =
-  let* system_sock = make_socket host system_port in
-  let t = { platform = system_sock } in
-  let+ _ = startup_platform t.platform in
+let send_command fd cmd =
+  let c = Cstruct.create Platform_command.sizeof_payload in
+  let _ =
+    Platform_command.set_payload_command c (Platform_command.t_to_int cmd)
+  in
+  let* _ = Lwt_cstruct.write fd c in
+  let resp = Cstruct.create 4 in
+  let* _ = Lwt_cstruct.read fd resp in
+  if Cstruct.BE.get_uint32 resp 0 <> Int32.zero then
+    Lwt.return_error "Invalid response code"
+  else Lwt.return_ok ()
+
+let make ?(host = "localhost") ?(port = 2321) ?(system_port = 2322) () =
+  let sock = make_socket () in
+  let system_sock = make_socket () in
+  let t = { host; port; system_port; platform = system_sock; tpm = sock } in
   t
+
+let initialize t =
+  let* _ = connect t.platform t.host t.system_port in
+  let* _ = connect t.tpm t.host t.port in
+  let plat = t.platform in
+  send_command plat Platform_command.PowerOn
+
+let shutdown t =
+  let plat = t.platform in
+  let+ res = send_command plat Platform_command.Stop in
+  match res with Ok _ -> () | Error _e -> ()
 
 let execute _ = Lwt.return "sorry"
