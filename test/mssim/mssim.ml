@@ -1,5 +1,9 @@
 open Lwt.Syntax
 
+let src = Logs.Src.create "mssim"
+
+module Log = (val Logs.src_log src : Logs.LOG)
+
 type t = {
   host : string;
   port : int;
@@ -15,9 +19,15 @@ let make_socket () =
   sock
 
 let connect fd _host port =
-  let loop = Unix.inet6_addr_loopback in
+  let loop = Unix.inet_addr_loopback in
   let addr = Unix.ADDR_INET (loop, port) in
   Lwt_unix.connect fd addr
+
+let handle_execute fd payload =
+  let* _ = Lwt_cstruct.write fd payload in
+  let resp = Cstruct.create Serialization.Tpm_response.sizeof_t in
+  let+ _ = Lwt_cstruct.read fd resp in
+  Ok "nope"
 
 let send_command fd cmd =
   let c = Cstruct.create Platform_command.sizeof_payload in
@@ -48,4 +58,6 @@ let shutdown t =
   let+ res = send_command plat Platform_command.Stop in
   match res with Ok _ -> () | Error _e -> ()
 
-let execute _ = Lwt.return "sorry"
+let execute t payload =
+  let tpm = t.tpm in
+  handle_execute tpm payload

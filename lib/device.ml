@@ -4,5 +4,5 @@ module type S = sig
   val name : string
   val initialize : t -> (unit, string) result Lwt.t
   val shutdown : t -> unit Lwt.t
-  val execute : string -> string Lwt.t
+  val execute : t -> Cstruct.t -> (string, string) result Lwt.t
 end

@@ -4,5 +4,5 @@ module type S = sig
 
   val code : Command_code.t
   val create : config -> t
-  val serialize : t -> (string, Serialization_error.t) result
+  val serialize : t -> (Cstruct.t, Serialization.Serialization_error.t) result
 end

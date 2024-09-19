@@ -1,3 +1,1 @@
-type t
-
-val run_command : (module Command.S with type t = 'a) -> t -> 'a -> string
+module Make (D : Device.S) : Command_handler_intf.S with type device = D.t
