@@ -20,4 +20,13 @@ module Make (D : Device.S) = struct
     let* _res = D.execute t.device serialized in
     let* _ = Log.info (fun f -> f "Received response: ") in
     Lwt.return_ok "hello"
+
+  let run_operation (type r) t (module O : Operation.S with type Response.t = r)
+      =
+    let cmd = O.this in
+    let ser = O.Command.serialize cmd |> Result.get_ok in
+    let* res = D.execute t.device ser in
+    let res = Result.get_ok res in
+    let resp = O.Response.deserialize res |> Result.get_ok in
+    Lwt.return_ok resp
 end

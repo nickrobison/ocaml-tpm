@@ -51,7 +51,7 @@ let handle_execute fd payload =
     (Fmt.str "Stringified: %s"
        (Cstruct.to_string ~off:Serialization.Tpm_response.sizeof_t
           ~len:resp_size resp'));
-  Ok "nope"
+  Ok (Cstruct.sub_copy resp' Serialization.Tpm_response.sizeof_t 27)
 
 let send_command fd cmd =
   print_endline

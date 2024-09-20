@@ -9,4 +9,9 @@ module type S = sig
     t ->
     'a ->
     (string, string) result Lwt.t
+
+  val run_operation :
+    t ->
+    (module Operation.S with type Response.t = 'a) ->
+    ('a, string) result Lwt.t
 end

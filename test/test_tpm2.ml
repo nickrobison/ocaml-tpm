@@ -8,7 +8,7 @@ let _test_connect () =
   let _ = Lwt_main.run (Mssim.initialize made) in
   ()
 
-let get_hashes _switch () =
+let _get_hashes _switch () =
   print_endline "Made";
   let sim = Mssim.make ~host:"localhost" ~port:2321 ~system_port:2322 () in
   let ch = CH.make sim in
@@ -29,6 +29,22 @@ let get_hashes _switch () =
   in
   ()
 
+let get_tpm_vendor _switch () =
+  let sim = Mssim.make ~host:"localhost" ~port:2321 ~system_port:2322 () in
+  let ch = CH.make sim in
+  print_endline "Doing init";
+  let* _ = Mssim.initialize sim in
+  print_endline "Initeded";
+  print_endline "Do startup";
+  let* _ =
+    CH.run_command (module Startup) ch (Startup.create { clear = true })
+  in
+  print_endline "Started up";
+  let+ response = CH.run_operation ch Tpm2.Get_tpm_info.make in
+  Alcotest.(check string)
+    "Should be IBM" "IBM"
+    (Result.get_ok response |> Get_capability_response.get_vendor)
+
 let () =
   let open Alcotest_lwt in
   Lwt_main.run
@@ -39,7 +55,9 @@ let () =
              (*
           test_case "TestIt" `Quick test_ok;
           test_case "TestLWT" `Quick test_connect;
-            *)
+           
              test_case "Hashes" `Quick get_hashes;
+                *)
+             test_case "TPMVendor" `Quick get_tpm_vendor;
            ] );
        ]
