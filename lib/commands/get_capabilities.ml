@@ -21,6 +21,17 @@ let make_payload (cap : Capability.t) =
       in
       b
   | Handles -> failwith "Not supported"
+  | Tpm_properties p ->
+      let prop =
+        S.Tpm_properties.t_of_property p |> S.Tpm_properties.t_to_int
+      in
+      let cap =
+        S.Tpm_capability.t_to_int S.Tpm_capability.CapabilityTPMProperties
+      in
+      S.Tpm_get_capability.set_c_capability b cap;
+      S.Tpm_get_capability.set_c_property b prop;
+      S.Tpm_get_capability.set_c_property_count b Int32.one;
+      b
 
 let serialize t =
   let payload = make_payload t.capability in
@@ -35,4 +46,6 @@ let serialize t =
       (S.Struct_tag.t_to_int S.Struct_tag.NoSessions)
   in
   let ppp = Cstruct.append header payload in
+  print_endline
+    Fmt.(str "Serialized to: %a with size: %i" Cstruct.hexdump_pp ppp cmd_size);
   Ok ppp

@@ -11,6 +11,8 @@ module Make (D : Device.S) = struct
   let make device = { device }
 
   let run_command (type a) (module C : Command.S with type t = a) t c =
+    print_endline
+      (Fmt.str "Sending command %s" (Command_code.t_to_string C.code));
     let serialized = C.serialize c |> Result.get_ok in
     let* _ =
       Log.err (fun f -> f "Serialized to: %a" Cstruct.hexdump_pp serialized)

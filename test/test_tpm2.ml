@@ -15,11 +15,17 @@ let get_hashes _switch () =
   print_endline "Doing init";
   let* _ = Mssim.initialize sim in
   print_endline "Initeded";
+  print_endline "Do startup";
+  let* _ =
+    CH.run_command (module Startup) ch (Startup.create { clear = true })
+  in
+  print_endline "Started up";
   let+ _ =
     CH.run_command
       (module Get_capabilities)
       ch
-      (Get_capabilities.create (Capability.Algorithms Algorithm_id.RSA))
+      (Get_capabilities.create
+         (Capability.Tpm_properties Tpm_property.Manufacturer))
   in
   ()
 
