@@ -4,6 +4,18 @@ let src = Logs.Src.create "mssim"
 
 module Log = (val Logs.src_log src : Logs.LOG)
 
+type error = [ Tpm2.Device.error | `Msg of string ]
+
+let pp_error ppf = function
+  | #Tpm2.Device.error as e -> Tpm2.Device.pp_error ppf e
+  | `Msg s -> Fmt.string ppf s
+
+type write_error = [ Tpm2.Device.write_error | `Msg of string ]
+
+let pp_write_error ppf = function
+  | #Tpm2.Device.write_error as e -> Tpm2.Device.pp_write_error ppf e
+  | `Msg s -> Fmt.string ppf s
+
 type t = {
   host : string;
   port : int;
@@ -89,11 +101,36 @@ let shutdown t =
 let execute t payload =
   let tpm = t.tpm in
   (*MSSIM requires command 8, locality and payload size, then the payload*)
-  let payload_size = Cstruct.length payload |> Int32.of_int in
+  let payload_size = Cstruct.length payload in
+  print_endline (Fmt.str "TPM command paload size: %i" payload_size);
+  let body = Cstruct.create Tpm_command.sizeof_payload in
+  Tpm_command.set_payload_command body
+    (Platform_command.t_to_int Platform_command.SendCommand);
+  Tpm_command.set_payload_locality body 0;
+  Tpm_command.set_payload_payload_size body (Int32.of_int payload_size);
+  handle_execute tpm (Cstruct.append body payload)
+
+let write t buffer =
+  (*MSSIM requires command 8, locality and payload size, then the payload*)
+  let payload_size = Cstruct.length buffer |> Int32.of_int in
   print_endline (Fmt.str "TPM command paload size: %a" Fmt.int32 payload_size);
   let body = Cstruct.create Tpm_command.sizeof_payload in
   Tpm_command.set_payload_command body
     (Platform_command.t_to_int Platform_command.SendCommand);
   Tpm_command.set_payload_locality body 0;
   Tpm_command.set_payload_payload_size body payload_size;
-  handle_execute tpm (Cstruct.append body payload)
+  let* _ = Lwt_cstruct.write t.tpm (Cstruct.append body buffer) in
+  (* MSSIM then responds back with a uint32 indicating the remaining payload size, so read that out.*)
+  let resp = Cstruct.create 4 in
+  let* _ = Lwt_cstruct.read t.tpm resp in
+  let resp_size = Tpm_command.get_response_output_size resp |> Int32.to_int in
+  Fmt.(
+    pf stdout "MSSIM returned: %a with size %i\n" Cstruct.hexdump_pp resp
+      resp_size);
+  (* We should do something with this*)
+  Lwt.return_ok ()
+
+let read t buffer =
+  (*TODO: Check to ensure we read as much as we wanted*)
+  let+ _read = Lwt_cstruct.read t.tpm buffer in
+  Ok ()

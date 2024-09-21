@@ -1,6 +1,7 @@
 module type S = sig
   type t
   type device
+  type error
 
   val make : device -> t
 
@@ -13,5 +14,5 @@ module type S = sig
   val run_operation :
     t ->
     (module Operation.S with type Response.t = 'a) ->
-    ('a, string) result Lwt.t
+    ('a, error) result Lwt.t
 end
