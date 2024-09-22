@@ -4,5 +4,6 @@ type t =
   | Startup [@id 0x00000144]
   | Shutdown [@id 0x00000145]
   | GetCapability [@id 0x0000017A]
+  | GetRandom [@id 0x0000017B]
 [@@uint32_t] [@@sexp]]
 [@@deriving show]

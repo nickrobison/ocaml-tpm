@@ -1,6 +1,6 @@
 (library
  (name commands)
  (wrapped false)
- (libraries sexplib serialization types fmt)
+ (libraries sexplib serialization types fmt logs)
  (preprocess
   (pps ppx_deriving.show ppx_sexp_conv ppx_cstruct)))
