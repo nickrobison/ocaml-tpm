@@ -1,0 +1,4 @@
+(library
+ (name tpm2_unix)
+ (public_name tpm2.unix)
+ (libraries lwt.unix tpm2))

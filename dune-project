@@ -19,8 +19,12 @@
  (name tpm2)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune logs fmt lwt ppx_deriving ppx_sexp_conv cstruct ppx_cstruct cohttp-lwt-unix alcotest cstruct-lwt duration)
+ (depends (ocaml (>= 4.08)) dune logs fmt lwt ppx_deriving ppx_sexp_conv cstruct ppx_cstruct alcotest cstruct-lwt duration)
  (tags
   (topics "to describe" your project)))
+
+(package
+ (name tpm2_unix)
+ (depends (tpm2 (= :version)) lwt))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

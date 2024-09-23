@@ -1,5 +1,6 @@
 (library
  (name commands)
+ (public_name tpm2.commands)
  (wrapped false)
  (libraries sexplib serialization types fmt logs)
  (preprocess

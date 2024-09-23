@@ -1,5 +1,6 @@
 (library
  (name types)
+ (public_name tpm2.types)
  (wrapped false)
  (libraries sexplib)
  (preprocess

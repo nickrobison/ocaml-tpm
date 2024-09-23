@@ -1,4 +1,5 @@
 (executable
  (public_name tpm2)
+ (package tpm2_unix)
  (name main)
- (libraries tpm2))
+ (libraries tpm2.unix))
