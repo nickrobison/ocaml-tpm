@@ -6,9 +6,14 @@ let get_clock sim =
   let ch = CH.make sim in
   let+ resp = CH.run_operation ch Tpm2.Read_clock_op.instance in
   let resp' = resp |> Result.get_ok in
-  Alcotest.(check int64)
-    "Should have len 4" Int64.zero
-    (Read_clock_response.get_time resp')
+  Alcotest.(check int) "Should have 0 restarts" 0 resp'.restarts;
+  Alcotest.(check int) "Should have 0 resets" 0 resp'.resets;
+  Alcotest.(check bool)
+    "Should have time greater than 0" true
+    Int64.(resp'.time > zero);
+  Alcotest.(check bool)
+    "Should have clock greater than 0" true
+    Int64.(resp'.clock > zero)
 
 let v =
   let open Alcotest_lwt in

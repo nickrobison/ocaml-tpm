@@ -22,6 +22,7 @@ depends: [
   "cohttp-lwt-unix"
   "alcotest"
   "cstruct-lwt"
+  "duration"
   "odoc" {with-doc}
 ]
 build: [
