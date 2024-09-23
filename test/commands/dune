@@ -1,4 +1,4 @@
 (test
  (name test_commands)
  (package tpm2)
- (libraries tpm2 mssim alcotest-lwt))
+ (libraries tpm2 testutils alcotest-lwt))
