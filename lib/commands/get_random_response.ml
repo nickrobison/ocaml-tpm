@@ -7,6 +7,8 @@ module Log = (val Logs.src_log src : Logs.LOG)
 
 type t = { algorithm : int; random_bytes : string } [@@deriving sexp, show]
 
+let get_bytes t = t.random_bytes
+
 let deserialize b =
   Log.debug (fun f -> f "Response Payload: %a" Cstruct.hexdump_pp b);
   let size = S.Tpm_random.get_t_size b in
