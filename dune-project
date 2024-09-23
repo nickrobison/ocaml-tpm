@@ -25,6 +25,6 @@
 
 (package
  (name tpm2_unix)
- (depends (tpm2 (= :version)) lwt))
+ (depends (tpm2 (= :version)) lwt ))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
