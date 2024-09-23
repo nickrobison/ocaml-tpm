@@ -134,3 +134,5 @@ let read t buffer =
   (*TODO: Check to ensure we read as much as we wanted*)
   let+ _read = Lwt_cstruct.read t.tpm buffer in
   Ok ()
+
+let reset t = send_command t.platform Platform_command.Reset
