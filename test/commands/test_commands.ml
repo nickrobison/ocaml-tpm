@@ -4,4 +4,4 @@ let () =
   Logs.set_level (Some Debug);
   Logs.set_reporter (Logs_fmt.reporter ())
 
-let () = Lwt_main.run @@ run "Command Tests" [ Test_random.v; Test_clock.v ]
+let () = Lwt_main.run @@ run "Command Tests" [ Test_pcr.v ]

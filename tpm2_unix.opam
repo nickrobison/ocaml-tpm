@@ -10,7 +10,6 @@ depends: [
   "dune" {>= "3.16"}
   "tpm2" {= version}
   "lwt"
-  "bos"
   "odoc" {with-doc}
 ]
 build: [

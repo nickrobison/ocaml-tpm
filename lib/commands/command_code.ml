@@ -6,5 +6,6 @@ type t =
   | GetCapability [@id 0x0000017A]
   | GetRandom [@id 0x0000017B]
   | ReadClock [@id 0x00000181]
+  | PcrRead [@id 0x0000017E]
 [@@uint32_t] [@@sexp]]
 [@@deriving show]

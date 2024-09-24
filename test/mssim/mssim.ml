@@ -66,8 +66,8 @@ let handle_execute fd payload =
   Ok (Cstruct.sub_copy resp' Serialization.Tpm_response.sizeof_t 27)
 
 let send_command fd cmd =
-  print_endline
-    (Fmt.str "Executing command: %s" (Platform_command.t_to_string cmd));
+  Log.debug (fun f ->
+      f "Executing command: %s" (Platform_command.t_to_string cmd));
   let c = Cstruct.create Platform_command.sizeof_payload in
   let _ =
     Platform_command.set_payload_command c (Platform_command.t_to_int cmd)
