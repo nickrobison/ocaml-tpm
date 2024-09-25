@@ -19,7 +19,7 @@
  (name tpm2)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends (ocaml (>= 4.08)) dune logs fmt lwt ppx_deriving ppx_sexp_conv cstruct ppx_cstruct alcotest cstruct-lwt duration)
+ (depends (ocaml (>= 4.08)) dune logs fmt lwt ppx_deriving ppx_sexp_conv cstruct ppx_cstruct alcotest cstruct-lwt duration ohex)
  (tags
   (topics "to describe" your project)))
 
