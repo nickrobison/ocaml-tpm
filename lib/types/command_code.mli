@@ -1,4 +1,3 @@
-[%%cenum
 type t =
   | SelfTest
   | Startup
@@ -7,5 +6,7 @@ type t =
   | GetRandom
   | ReadClock
   | PcrRead
-[@@uint32_t] [@@sexp]]
-[@@deriving show]
+[@@deriving sexp, show, eq]
+
+val t_to_int : t -> int32
+val t_to_string : t -> string

@@ -64,6 +64,7 @@ type t =
   | ErrorBinding
   | ErrorCurve
   | ErrorECCPoint
+[@@deriving sexp, show, eq]
 
 val to_int : t -> int
 val of_int : int -> t option

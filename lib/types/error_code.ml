@@ -65,7 +65,7 @@ type t =
   | ErrorBinding
   | ErrorCurve
   | ErrorECCPoint
-[@@uint8_t]]
+[@@uint8_t] [@@sexp]]
 
 let to_int = t_to_int
 let of_int = int_to_t
@@ -73,3 +73,7 @@ let of_int = int_to_t
 let to_hex t =
   let i = t_to_int t in
   Fmt.str "0x%04x" i
+
+let pp ppf t = Fmt.pf ppf "%s" (t_to_string t)
+let show t = Fmt.str "%a" pp t
+let equal l r = t_to_int l == t_to_int r

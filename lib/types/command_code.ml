@@ -9,3 +9,7 @@ type t =
   | PcrRead [@id 0x0000017E]
 [@@uint32_t] [@@sexp]]
 [@@deriving show]
+
+let pp ppf t = Fmt.string ppf (t_to_string t)
+let show = t_to_string
+let equal l r = t_to_int l == t_to_int r
